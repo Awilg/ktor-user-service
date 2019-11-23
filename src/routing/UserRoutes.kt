@@ -9,6 +9,7 @@ import io.ktor.routing.post
 fun Routing.userRoutes() {
     get("/user") {
         call.respondText("Getting a user!")
+
     }
     post("/user") {
         call.respondText("Saving a user!")

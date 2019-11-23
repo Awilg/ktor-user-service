@@ -1,6 +1,7 @@
 package com.yarn.services.data
 
-class UserDao {
+import com.yarn.services.models.*
+import org.litote.kmongo.coroutine.*
 
-}
+class UserDao(collection: CoroutineCollection<User>) : BaseDaoAsync<User>(collection)
 
