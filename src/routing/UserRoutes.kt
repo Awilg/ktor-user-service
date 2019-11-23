@@ -6,7 +6,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
 
-fun Routing.user() {
+fun Routing.userRoutes() {
     get("/user") {
         call.respondText("Getting a user!")
     }
