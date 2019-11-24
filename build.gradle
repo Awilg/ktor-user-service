@@ -48,5 +48,8 @@ dependencies {
     compile "org.litote.kmongo:kmongo-id:$kmongo_version"
     compile "org.litote.kmongo:kmongo-id-jackson:$kmongo_version"
 
+    // Kodein
+    compile "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
+
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }

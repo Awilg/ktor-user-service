@@ -1,23 +1,29 @@
 package com.yarn.services
 
-import com.fasterxml.jackson.databind.*
-import com.yarn.services.data.*
-import com.yarn.services.models.*
-import com.yarn.services.routing.*
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.jackson.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import kotlinx.coroutines.*
-import org.bson.types.*
-import org.litote.kmongo.*
-import org.litote.kmongo.coroutine.*
-import org.litote.kmongo.id.*
-import org.litote.kmongo.id.jackson.*
-import org.litote.kmongo.reactivestreams.*
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.yarn.services.controllers.KodeinController
+import com.yarn.services.controllers.UserController
+import com.yarn.services.data.UserDao
+import com.yarn.services.models.User
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.http.ContentType
+import io.ktor.jackson.jackson
+import io.ktor.response.respondText
+import io.ktor.routing.get
+import io.ktor.routing.routing
+import org.kodein.di.Instance
+import org.kodein.di.Kodein
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.instance
+import org.kodein.di.generic.singleton
+import org.kodein.di.jvmType
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.id.jackson.IdJacksonModule
 import org.litote.kmongo.reactivestreams.KMongo
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -34,42 +40,66 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
+    install(DefaultHeaders) {
 
-//    intercept(ApplicationCallPipeline.Features) {
-//        val requestId = UUID.randomUUID()
-//        logger.attach("req.Id", requestId.toString()) {
-//            logger.info("Interceptor[start]")
-//            proceed()
-//            logger.info("Interceptor[end]")
-//        }
-//    }
+    }
 
-
+    // Connect to the DB
     val client = KMongo.createClient().coroutine //use coroutine extension
     val database = client.getDatabase("Yarn-User") //normal java driver usage
     val userCol = database.getCollection<User>() //KMongo extension method
 
-    val userDao = UserDao(userCol)
+    kodeinApplication {
+        bind<UserDao>() with singleton { UserDao(userCol) }
+        bindSingleton { UserController(it) }
+    }
 
     routing {
         get("/") {
-            logger.info("HELLO, WORLD!")
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
-
-        get("/get") {
-            logger.info("HELLO, WORLD!")
-            val user = userCol.findOne(User::key eq ObjectId("5dd9a2933eea1e4550f66e46").toId())
-            user?.let { u -> call.respond(u) }
-        }
-
-        get("/test") {
-            logger.info("WHAT IS GOING ON!!!!!!!")
-            userDao.save(User(name = "james"))
-            call.respondText("Success")
-        }
-
-        userRoutes()
     }
 }
 
+/**
+ * Registers a [kodeinApplication] that that will call [kodeinMapper] for mapping stuff.
+ * The [kodeinMapper] is a lambda that is in charge of mapping all the required.
+ *
+ * After calling [kodeinMapper], this function will search
+ * for registered subclasses of [KodeinController], and will call their [KodeinController.registerRoutes] methods.
+ */
+fun Application.kodeinApplication(
+    kodeinMapper: Kodein.MainBuilder.(Application) -> Unit = {}
+) {
+    val application = this
+
+    /**
+     * Creates a [Kodein] instance, binding the [Application] instance.
+     * Also calls the [kodeInMapper] to map the Controller dependencies.
+     */
+    val kodein = Kodein {
+        bind<Application>() with instance(application)
+        kodeinMapper(this, application)
+    }
+
+    /**
+     * Detects all the registered [KodeinController] and registers its routes.
+     */
+    routing {
+        for (bind in kodein.container.tree.bindings) {
+            val bindClass = bind.key.type.jvmType as? Class<*>?
+            if (bindClass != null && KodeinController::class.java.isAssignableFrom(bindClass)) {
+                val res by kodein.Instance(bind.key.type)
+                println("Registering '$res' routes...")
+                (res as KodeinController).apply { registerRoutes() }
+            }
+        }
+    }
+}
+
+/**
+ * Shortcut for binding singletons to the same type.
+ */
+inline fun <reified T : Any> Kodein.MainBuilder.bindSingleton(crossinline callback: (Kodein) -> T) {
+    bind<T>() with singleton { callback(this@singleton.kodein) }
+}
