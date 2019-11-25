@@ -1,19 +1,30 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:$shadow_version"
     }
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: "com.github.johnrengelman.shadow"
 
 group 'com.yarn.services'
 version '0.0.1'
 mainClassName = "io.ktor.server.netty.EngineMain"
+
+shadowJar {
+    baseName = 'user-service'
+    classifier = null
+    version = null
+}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']

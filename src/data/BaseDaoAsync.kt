@@ -5,7 +5,6 @@ import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.id.toId
-import org.litote.kmongo.toId
 import org.litote.kmongo.util.idValue
 
 open class BaseDaoAsync<T: Any>(private val collection: CoroutineCollection<T>) : IBaseDaoAsync<T> {
