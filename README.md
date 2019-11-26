@@ -17,9 +17,30 @@ Clone the repository as normal and run the following
 
 ## Usage
 
-```bash
-curl localhost:8080/
-HELLO, WORLD!
+Create a user:
+```
+POST http://localhost:8080/user
+
+Content-Type: application/json
+Accept: */*
+
+{
+    "name": "James"
+}
+```
+Sample response:
+```
+{
+  "key": "5ddc6ffe41383f37d0cb2fdc",
+  "name": "James",
+  "activeTreasureHunts": null,
+  "completedTreasureHunts": null,
+  "avatarUrl": null,
+  "createdAt": "1574727678011"
+}
 ```
 
-
+Fetch a user:
+```
+GET http://localhost:8080/user/5ddc6ffe41383f37d0cb2fdc
+```

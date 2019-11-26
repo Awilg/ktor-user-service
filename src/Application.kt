@@ -1,6 +1,7 @@
 package com.yarn.services
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.yarn.services.controllers.KodeinController
 import com.yarn.services.controllers.UserController
 import com.yarn.services.data.UserDao
@@ -28,8 +29,7 @@ import org.litote.kmongo.reactivestreams.KMongo
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-@kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
+fun Application.module() {
     install(Authentication) {
     }
 
@@ -37,6 +37,7 @@ fun Application.module(testing: Boolean = false) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
             registerModule(IdJacksonModule())
+            registerModule(JavaTimeModule())
         }
     }
 

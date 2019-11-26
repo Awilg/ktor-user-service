@@ -62,5 +62,8 @@ dependencies {
     // Kodein
     compile "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
 
+    // Jackson
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }
