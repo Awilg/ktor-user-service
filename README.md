@@ -20,10 +20,6 @@ Clone the repository as normal and run the following
 Create a user:
 ```
 POST http://localhost:8080/user
-
-Content-Type: application/json
-Accept: */*
-
 {
     "name": "James"
 }
