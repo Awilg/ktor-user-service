@@ -46,7 +46,7 @@ fun Application.module() {
     }
 
     // Connect to the DB
-    val client = KMongo.createClient("mongodb://mongo:27017").coroutine //use coroutine extension
+    val client = KMongo.createClient("mongodb://127.0.0.1:27017").coroutine //use coroutine extension
     val database = client.getDatabase("Yarn-User") //normal java driver usage
     val userCol = database.getCollection<User>() //KMongo extension method
 

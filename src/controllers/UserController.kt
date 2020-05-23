@@ -16,7 +16,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.id.toId
 
 class UserController(kodein: Kodein) : KodeinController(kodein) {
-    private val userDao : UserDao by instance()
+    private val userDao : UserDao by instance<UserDao>()
 
     override fun Routing.registerRoutes() {
         get("/user/{id}") {

@@ -6,7 +6,7 @@ import org.litote.kmongo.newId
 import java.time.Instant
 
 data class User(
-    @BsonId val key : Id<User> = newId(),
+    @BsonId val id : Id<User> = newId(),
     val name : String,
     val activeTreasureHunts: List<String>?,
     val completedTreasureHunts: List<String>?,
